@@ -1,0 +1,4 @@
+clientID: Your Client ID
+# These ^^ ^^ can be obtained from https://twitchtokengenerator.com/
+
+clientSecret: This is your client secret you can obtain it from the offical twitch dev dashboard
