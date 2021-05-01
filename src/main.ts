@@ -81,6 +81,7 @@ async function initTwitch(): Promise<void> {
 
     console.log("All Notif requests have been initialised successfully");
 
+
 }
 
 initTwitch().catch(console.error);
