@@ -3,18 +3,7 @@ import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
 import dotenv from "dotenv";
-import express from "express";
 dotenv.config();
-
-// const app = express();
-
-// // Set port
-// // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-// const port = process.env.PORT !== null || 8080;
-// // Routes
-// app.listen(port, () => {
-//     console.log("App running");
-// });
 
 
 const clientId = CONFIG.clientID;
