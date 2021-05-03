@@ -6,15 +6,15 @@ import dotenv from "dotenv";
 import express from "express";
 dotenv.config();
 
-const app = express();
+// const app = express();
 
-// Set port
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-const port = process.env.PORT !== null || 8080;
-// Routes
-app.listen(port, () => {
-    console.log("App running");
-});
+// // Set port
+// // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+// const port = process.env.PORT !== null || 8080;
+// // Routes
+// app.listen(port, () => {
+//     console.log("App running");
+// });
 
 
 const clientId = CONFIG.clientID;
@@ -27,8 +27,7 @@ async function initTwitch(): Promise<void> {
     void await apiClient.helix.eventSub.deleteAllSubscriptions();
 
     const adapter = new EnvPortAdapter({
-        hostName: "twitch-eventsub.herokuapp.com",
-        variableName: "PORT"
+        hostName: "twitch-eventsub.herokuapp.com"
 
     });
     const listener = new EventSubListener(apiClient, adapter,
