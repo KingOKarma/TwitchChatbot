@@ -1,28 +1,39 @@
+import { EnvPortAdapter, EventSubListener } from "twitch-eventsub";
 import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
-import { EventSubListener } from "twitch-eventsub";
-import { NgrokAdapter } from "twitch-eventsub-ngrok";
-
+import dotenv from "dotenv";
+dotenv.config();
 
 const clientId = CONFIG.clientID;
 const { clientSecret } = CONFIG;
 
 const authProvider = new ClientCredentialsAuthProvider(clientId, clientSecret);
 const apiClient = new ApiClient({ authProvider });
-
-void apiClient.helix.eventSub.deleteAllSubscriptions();
-
-const listener = new EventSubListener(apiClient, new NgrokAdapter(), "ciW$k&8Q4mue3neEPQ4Q&5mV5p!LpsHw7u55ZaH#X8vBP&YZqMLX%NE45Rph");
-listener.listen().catch(console.error);
-
-// Void apiClient.helix.eventSub.deleteAllSubscriptions();
-
-console.log("Starting up!");
-const userId = "192135643";
-
 async function initTwitch(): Promise<void> {
 
+    void await apiClient.helix.eventSub.deleteAllSubscriptions();
+
+    const adapter = new EnvPortAdapter({
+        hostName: "twitch-eventsub.herokuapp.com",
+        variableName: "PORT"
+
+    });
+    const listener = new EventSubListener(apiClient, adapter,
+        "ciW$k&8Q4mue3neEPQ4Q&5mV5p!LpsHw7u55ZaH#X8vBP&YZqMLX%NE45Rph",
+        { logger: { minLevel: "debug" } } );
+
+    await listener.listen().catch(console.error);
+
+
+    console.log("Starting up!");
+
+    const user = await apiClient.helix.users.getUserByName("king_o_karma");
+    if (user === null) {
+        throw new Error("Please enter a valid Twitch username in the config.yml");
+    }
+
+    const userId = user.id;
     await listener.subscribeToChannelUpdateEvents(userId, async (channel) => {
         console.log(`${channel.broadcasterDisplayName} Has set the new stream title to: "${channel.streamTitle}"`);
     });

@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/KingOKarma/TwitchWebhook#readme",
   "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "twitch": "^4.5.5",
     "twitch-auth": "^4.5.5",
     "twitch-eventsub": "^4.5.5",
@@ -25,6 +27,7 @@
     "typescript": "^4.2.4"
   },
   "devDependencies": {
+    "@types/express": "^4.17.11",
     "@types/js-yaml": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
