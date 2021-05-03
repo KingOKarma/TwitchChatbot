@@ -3,9 +3,7 @@ import { EventSubListener, MiddlewareAdapter } from "twitch-eventsub";
 import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
-import dotenv from "dotenv";
 import express from "express";
-dotenv.config();
 
 const app = express();
 

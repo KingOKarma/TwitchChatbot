@@ -1,21 +1,41 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+const twitch_eventsub_1 = require("twitch-eventsub");
 const twitch_1 = require("twitch");
 const globals_1 = require("./utils/globals");
 const twitch_auth_1 = require("twitch-auth");
-const twitch_eventsub_1 = require("twitch-eventsub");
-const twitch_eventsub_ngrok_1 = require("twitch-eventsub-ngrok");
+const express_1 = __importDefault(require("express"));
+// dotenv.config();
+const app = express_1.default();
+// Set port
+// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+const port = process.env.PORT || 8080;
+// Routes
 const clientId = globals_1.CONFIG.clientID;
 const { clientSecret } = globals_1.CONFIG;
 const authProvider = new twitch_auth_1.ClientCredentialsAuthProvider(clientId, clientSecret);
 const apiClient = new twitch_1.ApiClient({ authProvider });
-void apiClient.helix.eventSub.deleteAllSubscriptions();
-const listener = new twitch_eventsub_1.EventSubListener(apiClient, new twitch_eventsub_ngrok_1.NgrokAdapter(), "ciW$k&8Q4mue3neEPQ4Q&5mV5p!LpsHw7u55ZaH#X8vBP&YZqMLX%NE45Rph");
-listener.listen().catch(console.error);
-// Void apiClient.helix.eventSub.deleteAllSubscriptions();
-console.log("Starting up!");
-const userId = "192135643";
 async function initTwitch() {
+    void await apiClient.helix.eventSub.deleteAllSubscriptions();
+    const adapter = new twitch_eventsub_1.MiddlewareAdapter({
+        hostName: "twitch-eventsub.herokuapp.com"
+    });
+    const listener = new twitch_eventsub_1.EventSubListener(apiClient, adapter, "ciW$k&8Q4mue3neEPQ4Q&5mV5p!LpsHw7u55ZaH#X8vBP&YZqMLX%NE45Rph", { logger: { minLevel: "debug" } });
+    await listener.applyMiddleware(app).catch(console.error);
+    app.listen(port, async () => {
+        console.log("App running");
+        await listener.resumeExistingSubscriptions();
+    });
+    console.log("Starting up!");
+    const user = await apiClient.helix.users.getUserByName("king_o_karma");
+    if (user === null) {
+        throw new Error("Please enter a valid Twitch username in the config.yml");
+    }
+    const userId = user.id;
     await listener.subscribeToChannelUpdateEvents(userId, async (channel) => {
         console.log(`${channel.broadcasterDisplayName} Has set the new stream title to: "${channel.streamTitle}"`);
     });
