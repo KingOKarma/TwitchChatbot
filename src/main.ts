@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { EventSubListener, MiddlewareAdapter } from "twitch-eventsub";
 import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
@@ -9,8 +10,8 @@ dotenv.config();
 const app = express();
 
 // Set port
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-const port = process.env.PORT !== null || 8080;
+// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+const port = process.env.PORT || 8080;
 // Routes
 
 
