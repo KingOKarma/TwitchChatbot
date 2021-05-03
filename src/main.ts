@@ -1,9 +1,17 @@
-import { EnvPortAdapter, EventSubListener } from "twitch-eventsub";
+import { EventSubListener, MiddlewareAdapter } from "twitch-eventsub";
 import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
 import dotenv from "dotenv";
+import express from "express";
 dotenv.config();
+
+const app = express();
+
+// Set port
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+const port = process.env.PORT !== null || 8080;
+// Routes
 
 
 const clientId = CONFIG.clientID;
@@ -15,7 +23,7 @@ async function initTwitch(): Promise<void> {
 
     void await apiClient.helix.eventSub.deleteAllSubscriptions();
 
-    const adapter = new EnvPortAdapter({
+    const adapter = new MiddlewareAdapter({
         hostName: "twitch-eventsub.herokuapp.com"
 
     });
@@ -23,7 +31,12 @@ async function initTwitch(): Promise<void> {
         "ciW$k&8Q4mue3neEPQ4Q&5mV5p!LpsHw7u55ZaH#X8vBP&YZqMLX%NE45Rph",
         { logger: { minLevel: "debug" } } );
 
-    await listener.listen().catch(console.error);
+    await listener.applyMiddleware(app).catch(console.error);
+
+    app.listen(port, async () => {
+        console.log("App running");
+        await listener.resumeExistingSubscriptions();
+    });
 
 
     console.log("Starting up!");
