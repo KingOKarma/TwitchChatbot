@@ -33,7 +33,7 @@ async function initTwitch(): Promise<void> {
         { logger: { minLevel: "debug" } } );
 
     await listener.listen().catch(console.error);
-    await listener.resumeExistingSubscriptions();
+    // await listener.resumeExistingSubscriptions();
 
     // App.listen(port, async () => {
     //     Console.log("App running");
