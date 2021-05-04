@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-import { EnvPortAdapter, EventSubListener } from "twitch-eventsub";
+import { EventSubListener, ReverseProxyAdapter } from "twitch-eventsub";
 import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
+import env from "dotenv";
 import express from "express";
-
+env.config();
 const app = express();
-
 // Set port
 // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
 const port = process.env.PORT || 8080;
@@ -20,17 +20,19 @@ const authProvider = new ClientCredentialsAuthProvider(clientId, clientSecret);
 const apiClient = new ApiClient({ authProvider });
 async function initTwitch(): Promise<void> {
 
-    // void await apiClient.helix.eventSub.deleteAllSubscriptions();
+    void await apiClient.helix.eventSub.deleteAllSubscriptions();
 
-    const adapter = new EnvPortAdapter({
-        hostName: "twitch-eventsub.herokuapp.com"
+    const adapter = new ReverseProxyAdapter({
+        hostName: "twitch.bucketbot.dev",
+        pathPrefix: "/events",
+        port: 3000
 
     });
     const listener = new EventSubListener(apiClient, adapter,
         "ciW$k&8Q4mue3neEPQ4Q&5mV5p!LpsHw7u55ZaH#X8vBP&YZqMLX%NE45Rph",
         { logger: { minLevel: "debug" } } );
 
-    await listener.applyMiddleware(app).catch(console.error);
+    await listener.listen().catch(console.error);
 
     app.listen(port, async () => {
         console.log("App running");
