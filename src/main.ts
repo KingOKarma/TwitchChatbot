@@ -3,6 +3,7 @@ import { EventSubListener, ReverseProxyAdapter } from "twitch-eventsub";
 import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
+import { NgrokAdapter } from "twitch-eventsub-ngrok";
 
 
 async function initTwitch(): Promise<void> {
@@ -14,12 +15,33 @@ async function initTwitch(): Promise<void> {
     const apiClient = new ApiClient({ authProvider });
     await apiClient.helix.eventSub.deleteAllSubscriptions();
 
-    const adapter = new ReverseProxyAdapter({
-        externalPort: 443,
-        hostName: "twitch.bucketbot.dev",
-        port: 3000
+    let adapter = undefined;
 
-    });
+    switch (CONFIG.environment.toLowerCase()) {
+
+        case "dev": {
+            console.log("Running on Local/Developemnt environment");
+            adapter = new NgrokAdapter();
+            break;
+        }
+
+        case "production": {
+            console.log("Running on Production server");
+            adapter = new ReverseProxyAdapter({
+                externalPort: 443,
+                hostName: CONFIG.productionHostname,
+                port: CONFIG.proudctionPort
+
+            });
+            break;
+        }
+    }
+
+    if (adapter === undefined) {
+        throw new Error("In config.yml please put in the environment parameter either \"dev\" or \"production\"");
+    }
+
+
     const listener = new EventSubListener(apiClient, adapter,
         "ciW$k&8Q4mue3neEPQ4Q&5mV5p!LpsHw7u55ZaH#X8vBP&YZqMLX%NE45Rph",
         { logger: { minLevel: "debug" } } );

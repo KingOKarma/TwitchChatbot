@@ -8,6 +8,9 @@ import fs from "fs";
  * @property {string} accessToken
  * @property {string} clientID
  * @property {string} clientSecret
+ * @property {string} environment
+ * @property {string} productionHostname
+ * @property {string} proudctionPort
  * @property {string} twitchUsername
  */
 export default class Config {
@@ -19,6 +22,12 @@ export default class Config {
 
     public readonly clientSecret: string;
 
+    public readonly environment: string;
+
+    public readonly productionHostname: string;
+
+    public readonly proudctionPort: number;
+
     public readonly twitchUsername: string;
 
 
@@ -26,6 +35,9 @@ export default class Config {
         this.accessToken = "";
         this.clientID = "";
         this.clientSecret = "";
+        this.environment = "";
+        this.productionHostname = "";
+        this.proudctionPort = 0;
         this.twitchUsername = "";
 
     }

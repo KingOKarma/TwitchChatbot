@@ -10,4 +10,13 @@ clientID: Your Client ID
 #https://dev.twitch.tv/console/
 clientSecret: This is your client secret you can obtain it from the offical twitch dev dashboard
 
+environment: This should be either "dev" or "production" depending on which environment you are currnetly on
+
+productionHostname: The hostname for your server MUST NOT INCLUDE "https://" EG "www.example.com" (This code works better with nginx but you can use your own provider)
+
+proudctionPort: This should be your port number that is connected to your server (EG your nginx server port, example of nginx setup can be found in README.md)
+
 twitchUsername: Put Your Twitch Username here in full lowercase letters
+
+
+# If your hostname also has a path prefix you can go into main.ts and edit under "port" in "ReverseProxyAdapter":  "pathprefix" same case for the external port
