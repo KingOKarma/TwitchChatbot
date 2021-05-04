@@ -9,3 +9,5 @@ clientID: Your Client ID
 #Twitch Dev console can be found at:
 #https://dev.twitch.tv/console/
 clientSecret: This is your client secret you can obtain it from the offical twitch dev dashboard
+
+twitchUsername: Put Your Twitch Username here in full lowercase letters

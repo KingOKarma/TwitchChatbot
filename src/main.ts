@@ -3,15 +3,6 @@ import { EventSubListener, ReverseProxyAdapter } from "twitch-eventsub";
 import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
-import env from "dotenv";
-// Import express from "express";
-env.config();
-// Const app = express();
-// Set port
-// eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-const port = process.env.PORT || 8080;
-// Routes
-
 
 const clientId = CONFIG.clientID;
 const { clientSecret } = CONFIG;
@@ -20,7 +11,7 @@ const authProvider = new ClientCredentialsAuthProvider(clientId, clientSecret);
 const apiClient = new ApiClient({ authProvider });
 async function initTwitch(): Promise<void> {
 
-    void await apiClient.helix.eventSub.deleteAllSubscriptions();
+    await apiClient.helix.eventSub.deleteAllSubscriptions();
 
     const adapter = new ReverseProxyAdapter({
         externalPort: 443,
@@ -34,16 +25,11 @@ async function initTwitch(): Promise<void> {
         { logger: { minLevel: "debug" } } );
 
     await listener.listen().catch(console.error);
-    // await listener.resumeExistingSubscriptions();
-
-    // App.listen(port, async () => {
-    //     Console.log("App running");
-    // });
-
+    await listener.resumeExistingSubscriptions();
 
     console.log("Starting up!");
 
-    const user = await apiClient.helix.users.getUserByName("king_o_karma");
+    const user = await apiClient.helix.users.getUserByName(CONFIG.twitchUsername);
     if (user === null) {
         throw new Error("Please enter a valid Twitch username in the config.yml");
     }

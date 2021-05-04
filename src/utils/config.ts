@@ -6,7 +6,9 @@ import fs from "fs";
  * This represents the config.yml
  * @class Config
  * @property {string} accessToken
- * @property {string} userID
+ * @property {string} clientID
+ * @property {string} clientSecret
+ * @property {string} twitchUsername
  */
 export default class Config {
     private static readonly _configLocation = "./config.yml";
@@ -17,11 +19,14 @@ export default class Config {
 
     public readonly clientSecret: string;
 
+    public readonly twitchUsername: string;
+
 
     private constructor() {
         this.accessToken = "";
         this.clientID = "";
         this.clientSecret = "";
+        this.twitchUsername = "";
 
     }
 
