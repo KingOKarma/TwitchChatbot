@@ -15,6 +15,7 @@ async function initTwitch(): Promise<void> {
     await apiClient.helix.eventSub.deleteAllSubscriptions();
 
     const adapter = new ReverseProxyAdapter({
+        externalPort: 442,
         hostName: "twitch.bucketbot.dev",
         pathPrefix: "/events",
         port: 3000
