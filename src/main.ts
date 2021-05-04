@@ -4,13 +4,14 @@ import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
 
-const clientId = CONFIG.clientID;
-const { clientSecret } = CONFIG;
 
-const authProvider = new ClientCredentialsAuthProvider(clientId, clientSecret);
-const apiClient = new ApiClient({ authProvider });
 async function initTwitch(): Promise<void> {
 
+    const clientId = CONFIG.clientID;
+    const { clientSecret } = CONFIG;
+
+    const authProvider = new ClientCredentialsAuthProvider(clientId, clientSecret);
+    const apiClient = new ApiClient({ authProvider });
     await apiClient.helix.eventSub.deleteAllSubscriptions();
 
     const adapter = new ReverseProxyAdapter({
