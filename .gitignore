@@ -4,3 +4,4 @@ settingProvider.ts
 package-lock.json
 config.yml
 build
+.env

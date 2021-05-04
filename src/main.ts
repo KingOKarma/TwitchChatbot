@@ -4,9 +4,9 @@ import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
 import env from "dotenv";
-import express from "express";
+// Import express from "express";
 env.config();
-const app = express();
+// Const app = express();
 // Set port
 // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
 const port = process.env.PORT || 8080;
@@ -33,11 +33,11 @@ async function initTwitch(): Promise<void> {
         { logger: { minLevel: "debug" } } );
 
     await listener.listen().catch(console.error);
+    await listener.resumeExistingSubscriptions();
 
-    app.listen(port, async () => {
-        console.log("App running");
-        await listener.resumeExistingSubscriptions();
-    });
+    // App.listen(port, async () => {
+    //     Console.log("App running");
+    // });
 
 
     console.log("Starting up!");
