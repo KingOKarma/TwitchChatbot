@@ -9,11 +9,10 @@ const twitch_1 = require("twitch");
 const globals_1 = require("./utils/globals");
 const twitch_auth_1 = require("twitch-auth");
 const express_1 = __importDefault(require("express"));
-// dotenv.config();
 const app = express_1.default();
 // Set port
 // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-const port = process.env.PORT || 8080;
+// const port = process.env.PORT || 8080;
 // Routes
 const clientId = globals_1.CONFIG.clientID;
 const { clientSecret } = globals_1.CONFIG;
@@ -21,15 +20,16 @@ const authProvider = new twitch_auth_1.ClientCredentialsAuthProvider(clientId, c
 const apiClient = new twitch_1.ApiClient({ authProvider });
 async function initTwitch() {
     void await apiClient.helix.eventSub.deleteAllSubscriptions();
-    const adapter = new twitch_eventsub_1.MiddlewareAdapter({
-        hostName: "twitch-eventsub.herokuapp.com"
+    const adapter = new twitch_eventsub_1.ReverseProxyAdapter({
+        hostName: "canary.discord.com",
+        pathPrefix: "/api/webhooks/839201758198628363/AIj11rBH6ZmsYxuEYD1u46Bqvv4krDD5P78LC8CyQQCivxyZPxvDFXpmmToVgaEK3KsA"
     });
     const listener = new twitch_eventsub_1.EventSubListener(apiClient, adapter, "ciW$k&8Q4mue3neEPQ4Q&5mV5p!LpsHw7u55ZaH#X8vBP&YZqMLX%NE45Rph", { logger: { minLevel: "debug" } });
-    await listener.applyMiddleware(app).catch(console.error);
-    app.listen(port, async () => {
-        console.log("App running");
-        await listener.resumeExistingSubscriptions();
-    });
+    await listener.listen().catch(console.error);
+    await listener.resumeExistingSubscriptions();
+    // app.listen(port, async () => {
+    //     console.log("App running");
+    // });
     console.log("Starting up!");
     const user = await apiClient.helix.users.getUserByName("king_o_karma");
     if (user === null) {

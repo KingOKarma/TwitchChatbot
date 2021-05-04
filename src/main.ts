@@ -20,7 +20,7 @@ const authProvider = new ClientCredentialsAuthProvider(clientId, clientSecret);
 const apiClient = new ApiClient({ authProvider });
 async function initTwitch(): Promise<void> {
 
-    void await apiClient.helix.eventSub.deleteAllSubscriptions();
+    // void await apiClient.helix.eventSub.deleteAllSubscriptions();
 
     const adapter = new MiddlewareAdapter({
         hostName: "twitch-eventsub.herokuapp.com"
