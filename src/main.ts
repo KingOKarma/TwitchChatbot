@@ -15,6 +15,7 @@ async function initTwitch(): Promise<void> {
 
     const adapter = new ReverseProxyAdapter({
         hostName: "twitch.bucketbot.dev",
+        pathPrefix: "/events",
         port: 3000
 
     });
@@ -23,7 +24,6 @@ async function initTwitch(): Promise<void> {
         { logger: { minLevel: "debug" } } );
 
     await listener.listen().catch(console.error);
-    await listener.resumeExistingSubscriptions();
 
     console.log("Starting up!");
 
