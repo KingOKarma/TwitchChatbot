@@ -54,6 +54,7 @@ async function initTwitch(): Promise<void> {
     if (user === null) {
         throw new Error("Please enter a valid Twitch username in the config.yml");
     }
+    console.log(user.displayName);
 
     const userId = user.id;
     await listener.subscribeToChannelUpdateEvents(userId, async (channel) => {
