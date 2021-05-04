@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-import { EventSubListener, MiddlewareAdapter } from "twitch-eventsub";
+import { EnvPortAdapter, EventSubListener } from "twitch-eventsub";
 import { ApiClient } from "twitch";
 import { CONFIG } from "./utils/globals";
 import { ClientCredentialsAuthProvider } from "twitch-auth";
@@ -22,7 +22,7 @@ async function initTwitch(): Promise<void> {
 
     // void await apiClient.helix.eventSub.deleteAllSubscriptions();
 
-    const adapter = new MiddlewareAdapter({
+    const adapter = new EnvPortAdapter({
         hostName: "twitch-eventsub.herokuapp.com"
 
     });
