@@ -17,7 +17,7 @@ async function initTwitch(): Promise<void> {
     const adapter = new ReverseProxyAdapter({
         hostName: "twitch.bucketbot.dev",
         pathPrefix: "/events",
-        port: 443
+        port: 3000
 
     });
     const listener = new EventSubListener(apiClient, adapter,
