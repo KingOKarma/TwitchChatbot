@@ -6,9 +6,11 @@ import fs from "fs";
  * This represents the config.yml
  * @class Config
  * @property {string} accessToken
+ * @property {string} botAccessToken
  * @property {string} clientID
  * @property {string} clientSecret
  * @property {string} environment
+ * @property {string} prefix
  * @property {string} productionHostname
  * @property {string} proudctionPort
  * @property {string} twitchUsername
@@ -18,11 +20,15 @@ export default class Config {
 
     public readonly accessToken: string;
 
+    public readonly botAccessToken: string;
+
     public readonly clientID: string;
 
     public readonly clientSecret: string;
 
     public readonly environment: string;
+
+    public readonly prefix: string;
 
     public readonly productionHostname: string;
 
@@ -33,9 +39,11 @@ export default class Config {
 
     private constructor() {
         this.accessToken = "";
+        this.botAccessToken = "";
         this.clientID = "";
         this.clientSecret = "";
         this.environment = "";
+        this.prefix = "";
         this.productionHostname = "";
         this.proudctionPort = 0;
         this.twitchUsername = "";

@@ -1,5 +1,11 @@
+accessToken: Your access Token
+# This will be shown when using the link below in the url address, make sure this access token was allowed
+
+botAccessToken: This is the access Token used for the bot account
+# using your chatbot of choice's token (This is to allows the bot to view and type in chat)
+
 clientID: Your Client ID
-# When getting your client ID 
+# When getting your client ID
 # Make sure the broadcaster you are getting the client ID for has authorised this link
 
 #https://id.twitch.tv/oauth2/authorize?client_id=<CLIENTID>&redirect_uri=<OneOfTheLinksFromYourRedirectURL>&response_type=token&scope=bits:read%20channel:read:subscriptions
@@ -12,11 +18,11 @@ clientSecret: This is your client secret you can obtain it from the offical twit
 
 environment: This should be either "dev" or "production" depending on which environment you are currnetly on
 
+prefix: Your Prefix here
+
 productionHostname: The hostname for your server MUST NOT INCLUDE "https://" EG "www.example.com" (This code works better with nginx but you can use your own provider)
 
 proudctionPort: This should be your port number that is connected to your server (EG your nginx server port, example of nginx setup can be found in README.md)
 
 twitchUsername: Put Your Twitch Username here in full lowercase letters
-
-
 # If your hostname also has a path prefix you can go into main.ts and edit under "port" in "ReverseProxyAdapter":  "pathprefix" same case for the external port

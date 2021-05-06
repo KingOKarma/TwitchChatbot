@@ -1,22 +1,38 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import { ClientCredentialsAuthProvider, StaticAuthProvider } from "twitch-auth";
 import { EventSubListener, ReverseProxyAdapter } from "twitch-eventsub";
 import { ApiClient } from "twitch";
 import { CONFIG } from "./globals";
-import { ClientCredentialsAuthProvider } from "twitch-auth";
+import { ChatClient } from "twitch-chat-client";
 import { NgrokAdapter } from "twitch-eventsub-ngrok";
+import { TwitchPrivateMessage } from "twitch-chat-client/lib/StandardCommands/TwitchPrivateMessage";
 import cron from "cron";
 
 
+const { clientID } = CONFIG;
+const { clientSecret } = CONFIG;
+const { botAccessToken } = CONFIG;
+let { prefix } = CONFIG;
+
+
+if (CONFIG.prefix !== "") {
+    prefix = "!";
+
+}
+
+
+const authProvider = new ClientCredentialsAuthProvider(clientID, clientSecret);
+const authChatProvider = new StaticAuthProvider(clientID, botAccessToken);
+
+const apiClient = new ApiClient({ authProvider });
+
+
 /**
- * Initialise  the Eventsub
+ * Initialise the Eventsub
  */
 export async function intiEventSub(): Promise<void> {
 
-    const clientId = CONFIG.clientID;
-    const { clientSecret } = CONFIG;
 
-    const authProvider = new ClientCredentialsAuthProvider(clientId, clientSecret);
-    const apiClient = new ApiClient({ authProvider });
     await apiClient.helix.eventSub.deleteAllSubscriptions();
 
     let adapter = undefined;
@@ -120,7 +136,6 @@ export async function intiEventSub(): Promise<void> {
 
     console.log("All Notif requests have been initialised successfully");
     const subs = (await apiClient.helix.eventSub.getSubscriptions()).data;
-    console.log(subs);
     // Everyday at midnight
     const job = new cron.CronJob("00 00 00 * * *", () => {
         const d = new Date();
@@ -145,3 +160,32 @@ export async function intiEventSub(): Promise<void> {
     job.start();
 
 }
+
+/**
+ * Initialise the Twitch Chat Client
+ */
+export async function intiChatClient(): Promise<void> {
+    const chatClient = new ChatClient(authChatProvider, { channels: [CONFIG.twitchUsername] });
+    // Listen to more events...
+    await chatClient.connect();
+
+    chatClient.onMessage(async (channel: string, user: string, message: string, msg: TwitchPrivateMessage) => {
+
+
+        // Handler
+        const args = message.slice(prefix.length).trim().split(/ +/g);
+
+        const cmd = args.shift()?.toLowerCase();
+
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const commandFile = require(`../commands/${cmd}.js`);
+            commandFile.run(chatClient, channel, user, message, msg, args);
+
+        } catch (err) {
+
+        }
+
+    });
+}
+
