@@ -13,6 +13,7 @@ import fs from "fs";
  * @property {string} clientSecret
  * @property {string} discordChatChannelID
  * @property {string} environment
+ * @property {string} eventsChannelID
  * @property {string} prefix
  * @property {string} productionHostname
  * @property {string} proudctionPort
@@ -37,6 +38,8 @@ export default class Config {
 
     public readonly environment: string;
 
+    public readonly eventsChannelID: string;
+
     public readonly prefix: string;
 
     public readonly productionHostname: string;
@@ -55,6 +58,7 @@ export default class Config {
         this.clientSecret = "";
         this.discordChatChannelID = "";
         this.environment = "";
+        this.eventsChannelID = "";
         this.prefix = "";
         this.productionHostname = "";
         this.proudctionPort = 0;

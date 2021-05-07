@@ -1,5 +1,5 @@
-import BlockedUsers from "./blockedUsers";
 import Config from "./config";
+import Users from "./users";
 
 export const CONFIG = Config.getConfig();
-export const USERS = BlockedUsers.getConfig();
+export const USERS = Users.getConfig();

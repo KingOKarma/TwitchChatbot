@@ -7,7 +7,15 @@ import { ApiClient } from "twitch";
 import { ChatClient } from "twitch-chat-client";
 import { NgrokAdapter } from "twitch-eventsub-ngrok";
 import { TwitchPrivateMessage } from "twitch-chat-client/lib/StandardCommands/TwitchPrivateMessage";
+import Users from "./users";
 import cron from "cron";
+import { onCommunitySub } from "./chatEvents/onCommunitySub";
+import { onHosted } from "./chatEvents/onHosted";
+import { onRaid } from "./chatEvents/onRaid";
+import { onReSub } from "./chatEvents/onReSub";
+import { onSub } from "./chatEvents/onSub";
+import { onSubGift } from "./chatEvents/onSubGift";
+
 
 const bot = new Client();
 
@@ -21,6 +29,7 @@ void bot.login(CONFIG.botToken);
 const { clientID } = CONFIG;
 const { clientSecret } = CONFIG;
 const { botAccessToken } = CONFIG;
+const { accessToken } = CONFIG;
 let { prefix } = CONFIG;
 
 
@@ -31,6 +40,8 @@ if (CONFIG.prefix !== "") {
 
 const authProvider = new ClientCredentialsAuthProvider(clientID, clientSecret);
 const authChatProvider = new StaticAuthProvider(clientID, botAccessToken);
+const authUserChatProvider = new StaticAuthProvider(clientID, accessToken);
+
 
 const apiClient = new ApiClient({ authProvider });
 
@@ -78,6 +89,8 @@ export async function intiEventSub(): Promise<void> {
 
     console.log("Starting up!");
 
+    const eventsChannel = await bot.channels.fetch(CONFIG.eventsChannelID) as TextChannel;
+
     const user = await apiClient.helix.users.getUserByName(CONFIG.twitchUsername);
     if (user === null) {
         throw new Error("Please enter a valid Twitch username in the config.yml");
@@ -90,57 +103,31 @@ export async function intiEventSub(): Promise<void> {
     });
 
     await listener.subscribeToStreamOfflineEvents(userId, (channel) => {
+        USERS.canSendMessage = false;
+        Users.saveConfig();
         console.log(`${channel.broadcasterDisplayName} just went offline`);
     });
 
-    await listener.subscribeToChannelFollowEvents(userId, (channel) => {
-        console.log(`${channel.userDisplayName} has just followed!`);
+    await listener.subscribeToStreamOnlineEvents(userId, (channel) => {
+        USERS.canSendMessage = true;
+        Users.saveConfig();
+        console.log(`${channel.broadcasterDisplayName} just went online`);
     });
 
-    await listener.subscribeToChannelSubscriptionEvents(userId, (channel) => {
+    await listener.subscribeToChannelFollowEvents(userId, async (channel) => {
+        return eventsChannel.send(`${channel.userDisplayName} has just followed!`);
+    });
 
-        let subMessage;
-
-        switch (channel.tier) {
-            case "1000":
-                subMessage = `${channel.userDisplayName} Is now a tier 1 Sub!`;
-                break;
-
-
-            case "2000":
-                subMessage = `${channel.userDisplayName} Is now a tier 2 Sub!`;
-                break;
-
-
-            case "3000":
-                subMessage = `${channel.userDisplayName} Is now a tier 3 Sub!`;
-                break;
-        }
-
-        if (channel.isGift) {
-            subMessage.concat(" (This was a gift!)");
-        }
-
-
-        console.log(subMessage);
-    }
-    );
-
-    await listener.subscribeToChannelCheerEvents(userId, (channel) => {
+    await listener.subscribeToChannelCheerEvents(userId, async (channel) => {
         switch (channel.isAnonymous) {
             case true:
-                console.log(`An anonymous user has just cheered ${channel.bits} PogChamp \n\n ${channel.message}`);
-                break;
+                return eventsChannel.send(`An anonymous user has just cheered ${channel.bits} PogChamp \n\n ${channel.message}`);
 
             case false:
-                console.log(`${channel.userDisplayName} has just cheered ${channel.bits} PogChamp \n\n ${channel.message}`);
-                break;
+                return eventsChannel.send(`${channel.userDisplayName} has just cheered ${channel.bits} PogChamp \n\n ${channel.message}`);
         }
     });
 
-    await listener.subscribeToChannelRaidEventsTo(userId, (channel) => {
-        console.log(`${channel.raidingBroadcasterDisplayName} is raiding with ${channel.viewers} viewers!`);
-    });
 
     console.log("All Notif requests have been initialised successfully");
     const subs = (await apiClient.helix.eventSub.getSubscriptions()).data;
@@ -159,12 +146,12 @@ export async function intiEventSub(): Promise<void> {
 
             };
             if (subObject.status !== "enabled") {
+                await apiClient.helix.eventSub.deleteAllSubscriptions();
                 await listener.listen().catch(console.error);
             }
             console.log(subObject);
         });
     });
-    console.log("After job instantiation");
     job.start();
 
 }
@@ -174,16 +161,19 @@ export async function intiEventSub(): Promise<void> {
  */
 export async function intiChatClient(): Promise<void> {
     const chatClient = new ChatClient(authChatProvider, { channels: [CONFIG.twitchUsername] });
+    const userChatClient = new ChatClient(authUserChatProvider, { channels: [CONFIG.twitchUsername] });
     // Listen to more events...
     await chatClient.connect();
+    await userChatClient.connect();
 
     chatClient.onMessage(async (channel: string, user: string, message: string, msg: TwitchPrivateMessage) => {
-
         if (user === CONFIG.botUsername) return;
 
-        if (!USERS.blocked.some((check) => check === user)) {
-            const discordChannel = await bot.channels.fetch(CONFIG.discordChatChannelID) as TextChannel;
-            if (!message.startsWith(prefix)) {
+        if (USERS.canSendMessage) {
+            if (USERS.blocked.some((check) => check === user)) {
+            } else if (message.startsWith(prefix)) {
+            } else {
+                const discordChannel = await bot.channels.fetch(CONFIG.discordChatChannelID) as TextChannel;
                 void discordChannel.send(`**${user} :** ${message}`);
             }
         }
@@ -191,7 +181,6 @@ export async function intiChatClient(): Promise<void> {
         const args = message.slice(prefix.length).trim().split(/ +/g);
 
         const cmd = args.shift()?.toLowerCase();
-
 
         try {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -201,8 +190,50 @@ export async function intiChatClient(): Promise<void> {
         } catch (err) {
 
         }
-
     });
+
+    chatClient.onCommunitySub(async (
+        channel,
+        user,
+        subInfo,
+        msg
+    ) => onCommunitySub(channel, user, subInfo, msg, bot));
+
+    chatClient.onSubGift(async (
+        channel,
+        user,
+        subInfo,
+        msg
+    ) => onSubGift(channel, user, subInfo, msg, bot));
+
+    chatClient.onResub(async (
+        channel,
+        user,
+        subInfo,
+        msg
+    ) => onReSub(channel, user, subInfo, msg, bot));
+
+    chatClient.onSub(async (
+        channel,
+        user,
+        subInfo,
+        msg
+    ) => onSub(channel, user, subInfo, msg, bot));
+
+    userChatClient.onHosted(async (
+        channel,
+        byChannel,
+        auto,
+        viewers
+    ) => onHosted(channel, byChannel, auto, viewers, bot));
+
+    chatClient.onRaid(async (
+        channel,
+        user,
+        raidInfo,
+        msg
+    ) => onRaid(channel, user, raidInfo, msg, bot));
+
 }
 
 /**
@@ -223,3 +254,4 @@ export function checkPerms(msg: TwitchPrivateMessage): boolean {
     return hasperms;
 
 }
+

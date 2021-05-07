@@ -6,31 +6,35 @@ import fs from "fs";
  * This represents the blockedUsers.yml
  * @class BlockedUsers
  * @property {string} blocked
+ * @property {boolean} canSendMessage
 
  */
-export default class BlockedUsers {
-    private static readonly _configLocation = "./blockedUsers.yml";
+export default class Users {
+    private static readonly _configLocation = "./users.yml";
 
-    public readonly blocked: string[];
+    public blocked: string[];
+
+    public canSendMessage: boolean;
 
     private constructor() {
         this.blocked = [""];
+        this.canSendMessage = false;
 
     }
 
     /**
        *  Call getConfig instead of constructor
        */
-    public static getConfig(): BlockedUsers {
+    public static getConfig(): Users {
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (!fs.existsSync(BlockedUsers._configLocation)) {
+        if (!fs.existsSync(Users._configLocation)) {
             throw new Error("Please create a blockedUsers.yml");
         }
         const fileContents = fs.readFileSync(
-            BlockedUsers._configLocation,
+            Users._configLocation,
             "utf-8"
         );
-        const casted = load(fileContents) as BlockedUsers;
+        const casted = load(fileContents) as Users;
 
         return casted;
     }
@@ -39,6 +43,6 @@ export default class BlockedUsers {
    *  Safe the config to the congfig.yml default location
    */
     public static saveConfig(): void {
-        fs.writeFileSync(BlockedUsers._configLocation, dump(USERS));
+        fs.writeFileSync(Users._configLocation, dump(USERS));
     }
 }

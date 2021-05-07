@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import BlockedUsers from "../utils/blockedUsers";
 import { ChatClient } from "twitch-chat-client/lib";
 import { TwitchPrivateMessage } from "twitch-chat-client/lib/StandardCommands/TwitchPrivateMessage";
 import { USERS } from "../utils/globals";
+import Users from "../utils/users";
 import { checkPerms } from "../utils/events";
 
 exports.run = async (chatClient: ChatClient,
@@ -27,6 +27,6 @@ exports.run = async (chatClient: ChatClient,
     }
 
     USERS.blocked.push(blockedUser);
-    BlockedUsers.saveConfig();
+    Users.saveConfig();
     return chatClient.say(channel, `${blockedUser} has been added to the blocked list!`);
 };

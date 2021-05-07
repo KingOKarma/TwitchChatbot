@@ -24,6 +24,8 @@ discordChatChannelID: "This needs to be the channel ID for the discord channel t
 
 environment: This should be either "dev" or "production" depending on which environment you are currnetly on
 
+eventsChannelID: This is the discord channel ID for the channel that you want twitch events to be sent to
+
 prefix: Your Prefix here
 
 productionHostname: The hostname for your server MUST NOT INCLUDE "https://" EG "www.example.com" (This code works better with nginx but you can use your own provider)

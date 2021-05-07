@@ -6,31 +6,23 @@ import Users from "../utils/users";
 import { checkPerms } from "../utils/events";
 
 exports.run = async (chatClient: ChatClient,
+
     channel: string,
     user: string,
     message: string,
     msg: TwitchPrivateMessage,
     args: string[]): Promise<void> => {
 
-
     const perms = checkPerms(msg);
     if (!perms) return chatClient.say(channel, "Sorry this command can only be used by staff");
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (args[0] === undefined) {
-        return chatClient.say(channel, "Please type a user's name to add them to the list");
+    if (USERS.canSendMessage) {
+        USERS.canSendMessage = false;
+        Users.saveConfig();
+        return chatClient.say(channel, "Chat is no longer senidng to discord!");
+
     }
-
-    // eslint-disable-next-line prefer-destructuring
-    const blockedUser = args[0].toLowerCase();
-
-    if (!USERS.blocked.includes(blockedUser)) {
-        return chatClient.say(channel, "That user is not on the list!");
-    }
-
-    const userIndex = USERS.blocked.indexOf(blockedUser);
-    USERS.blocked.splice(userIndex, 1);
+    USERS.canSendMessage = true;
     Users.saveConfig();
-
-    return chatClient.say(channel, `${blockedUser} has been removed from the blocked list!`);
+    return chatClient.say(channel, "Chat is now being sent to discord!");
 };
