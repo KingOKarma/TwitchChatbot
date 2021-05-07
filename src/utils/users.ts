@@ -5,20 +5,28 @@ import fs from "fs";
 /**
  * This represents the blockedUsers.yml
  * @class BlockedUsers
- * @property {string} blocked
+ * @property {string[]} autoMsgs
+ * @property {string[]} blocked
  * @property {boolean} canSendMessage
+ * @property {string[]} customCommands
 
  */
 export default class Users {
     private static readonly _configLocation = "./users.yml";
 
+    public autoMsgs: string[];
+
     public blocked: string[];
 
     public canSendMessage: boolean;
 
+    public customCommands: string[];
+
     private constructor() {
+        this.autoMsgs = [""];
         this.blocked = [""];
         this.canSendMessage = false;
+        this.customCommands = [""];
 
     }
 

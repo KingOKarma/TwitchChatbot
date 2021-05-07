@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { CONFIG, USERS } from "./globals";
 import { Client, TextChannel } from "discord.js";
@@ -42,8 +43,8 @@ const authProvider = new ClientCredentialsAuthProvider(clientID, clientSecret);
 const authChatProvider = new StaticAuthProvider(clientID, botAccessToken);
 const authUserChatProvider = new StaticAuthProvider(clientID, accessToken);
 
-
 const apiClient = new ApiClient({ authProvider });
+let sentMessage = false;
 
 
 /**
@@ -106,6 +107,8 @@ export async function intiEventSub(): Promise<void> {
         USERS.canSendMessage = false;
         Users.saveConfig();
         console.log(`${channel.broadcasterDisplayName} just went offline`);
+        sentMessage = false;
+
     });
 
     await listener.subscribeToStreamOnlineEvents(userId, (channel) => {
@@ -156,6 +159,11 @@ export async function intiEventSub(): Promise<void> {
 
 }
 
+function getRandomNumber(min: number, max: number): number {
+    return Math.random() * (max - min) + min;
+}
+
+
 /**
  * Initialise the Twitch Chat Client
  */
@@ -166,6 +174,35 @@ export async function intiChatClient(): Promise<void> {
     await chatClient.connect();
     await userChatClient.connect();
 
+    const stream = await apiClient.helix.streams.getStreamByUserName(CONFIG.twitchUsername);
+
+    if (stream === null) {
+        USERS.canSendMessage = true;
+        Users.saveConfig();
+    }
+
+    // Const ranNum = getRandomNumber(600000, 900000);
+    const ranNum = getRandomNumber(60000, 120000);
+
+    setInterval(() => {
+        if (sentMessage) {
+            if (USERS.autoMsgs.length === 0) {
+                void chatClient.say(`#${CONFIG.twitchUsername}`,
+                    "That autoMessage list is empty! You can fill it up with !addauto <message>");
+                sentMessage = false;
+                return;
+
+            }
+            const autoMSG = USERS.autoMsgs[Math.floor(Math.random() * USERS.autoMsgs.length)];
+
+            void chatClient.say(`#${CONFIG.twitchUsername}`, autoMSG);
+            sentMessage = false;
+
+        }
+
+    }, ranNum);
+
+
     chatClient.onMessage(async (channel: string, user: string, message: string, msg: TwitchPrivateMessage) => {
         if (user === CONFIG.botUsername) return;
 
@@ -175,8 +212,16 @@ export async function intiChatClient(): Promise<void> {
             } else {
                 const discordChannel = await bot.channels.fetch(CONFIG.discordChatChannelID) as TextChannel;
                 void discordChannel.send(`**${user} :** ${message}`);
+
+
             }
         }
+
+        if (USERS.canSendMessage) {
+            sentMessage = true;
+
+        }
+
 
         const args = message.slice(prefix.length).trim().split(/ +/g);
 
