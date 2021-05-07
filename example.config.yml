@@ -4,6 +4,10 @@ accessToken: Your access Token
 botAccessToken: This is the access Token used for the bot account
 # using your chatbot of choice's token (This is to allows the bot to view and type in chat)
 
+botToken: This is your DISCORD BOT TOKEN
+
+botUsername: This is your TWITCH BOT's username (In lower case)
+
 clientID: Your Client ID
 # When getting your client ID
 # Make sure the broadcaster you are getting the client ID for has authorised this link
@@ -15,6 +19,8 @@ clientID: Your Client ID
 #Twitch Dev console can be found at:
 #https://dev.twitch.tv/console/
 clientSecret: This is your client secret you can obtain it from the offical twitch dev dashboard
+
+discordChatChannelID: "This needs to be the channel ID for the discord channel that you want messages to go to"
 
 environment: This should be either "dev" or "production" depending on which environment you are currnetly on
 

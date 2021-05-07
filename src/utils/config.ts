@@ -7,8 +7,11 @@ import fs from "fs";
  * @class Config
  * @property {string} accessToken
  * @property {string} botAccessToken
+ * @property {string} botToken
+ * @property {string} botUsername
  * @property {string} clientID
  * @property {string} clientSecret
+ * @property {string} discordChatChannelID
  * @property {string} environment
  * @property {string} prefix
  * @property {string} productionHostname
@@ -22,9 +25,15 @@ export default class Config {
 
     public readonly botAccessToken: string;
 
+    public readonly botToken: string;
+
+    public readonly botUsername: string;
+
     public readonly clientID: string;
 
     public readonly clientSecret: string;
+
+    public readonly discordChatChannelID: string;
 
     public readonly environment: string;
 
@@ -40,8 +49,11 @@ export default class Config {
     private constructor() {
         this.accessToken = "";
         this.botAccessToken = "";
+        this.botToken = "";
+        this.botUsername = "";
         this.clientID = "";
         this.clientSecret = "";
+        this.discordChatChannelID = "";
         this.environment = "";
         this.prefix = "";
         this.productionHostname = "";

@@ -19,6 +19,7 @@
   "homepage": "https://github.com/KingOKarma/TwitchWebhook#readme",
   "dependencies": {
     "cron": "^1.8.2",
+    "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "js-yaml": "^4.1.0",

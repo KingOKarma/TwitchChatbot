@@ -1,12 +1,21 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import { CONFIG, USERS } from "./globals";
+import { Client, TextChannel } from "discord.js";
 import { ClientCredentialsAuthProvider, StaticAuthProvider } from "twitch-auth";
 import { EventSubListener, ReverseProxyAdapter } from "twitch-eventsub";
 import { ApiClient } from "twitch";
-import { CONFIG } from "./globals";
 import { ChatClient } from "twitch-chat-client";
 import { NgrokAdapter } from "twitch-eventsub-ngrok";
 import { TwitchPrivateMessage } from "twitch-chat-client/lib/StandardCommands/TwitchPrivateMessage";
 import cron from "cron";
+
+const bot = new Client();
+
+bot.on("ready", () => {
+    console.log(`${bot.user?.tag} is online and ready!`);
+});
+
+void bot.login(CONFIG.botToken);
 
 
 const { clientID } = CONFIG;
@@ -17,7 +26,6 @@ let { prefix } = CONFIG;
 
 if (CONFIG.prefix !== "") {
     prefix = "!";
-
 }
 
 
@@ -171,11 +179,19 @@ export async function intiChatClient(): Promise<void> {
 
     chatClient.onMessage(async (channel: string, user: string, message: string, msg: TwitchPrivateMessage) => {
 
+        if (user === CONFIG.botUsername) return;
 
-        // Handler
+        if (!USERS.blocked.some((check) => check === user)) {
+            const discordChannel = await bot.channels.fetch(CONFIG.discordChatChannelID) as TextChannel;
+            if (!message.startsWith(prefix)) {
+                void discordChannel.send(`**${user} :** ${message}`);
+            }
+        }
+
         const args = message.slice(prefix.length).trim().split(/ +/g);
 
         const cmd = args.shift()?.toLowerCase();
+
 
         try {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -189,3 +205,21 @@ export async function intiChatClient(): Promise<void> {
     });
 }
 
+/**
+ * Checks if user has perms to use bot commands
+   * @param {TwitchPrivateMessage} msg Message instance
+ */
+export function checkPerms(msg: TwitchPrivateMessage): boolean {
+    let hasperms = false;
+
+    if (msg.userInfo.isBroadcaster) {
+        hasperms = true;
+    }
+
+    if (msg.userInfo.isMod) {
+        hasperms = true;
+    }
+
+    return hasperms;
+
+}
