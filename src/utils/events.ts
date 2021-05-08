@@ -177,7 +177,7 @@ export async function intiChatClient(): Promise<void> {
     const stream = await apiClient.helix.streams.getStreamByUserName(CONFIG.twitchUsername);
 
     if (stream === null) {
-        USERS.canSendMessage = true;
+        USERS.canSendMessage = false;
         Users.saveConfig();
     }
 
