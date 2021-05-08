@@ -8,11 +8,32 @@ This is a test mainly for practicing how webhooks work and how twitch webhooks w
 
 - run in your terminal `npm install` or if you're using yarn `yarn`
 
+- Create a file called `users.yml` this file will contain things like automessages, custom commands and blocked users
+
+file contents:
+
+```yml
+autoMsgs: []
+blocked: []
+canSendMessage: true
+customCommands: []
+```
+
 - Rename the file `example.config.yml` to `config.yml`
 
 - Write your parameters into the file, notes are written in the file:
 
 ```yml
+accessToken: Your access Token
+# This will be shown when using the link below in the url address, make sure this access token was allowed
+
+botAccessToken: This is the access Token used for the bot account
+# using your chatbot of choice's token (This is to allows the bot to view and type in chat)
+
+botToken: This is your DISCORD BOT TOKEN
+
+botUsername: This is your TWITCH BOT's username (In lower case)
+
 clientID: Your Client ID
 # When getting your client ID
 # Make sure the broadcaster you are getting the client ID for has authorised this link
@@ -25,11 +46,17 @@ clientID: Your Client ID
 #https://dev.twitch.tv/console/
 clientSecret: This is your client secret you can obtain it from the offical twitch dev dashboard
 
+discordChatChannelID: "This needs to be the channel ID for the discord channel that you want messages to go to"
+
 environment: This should be either "dev" or "production" depending on which environment you are currnetly on
+
+eventsChannelID: This is the discord channel ID for the channel that you want twitch events to be sent to
+
+prefix: Your Prefix here
 
 productionHostname: The hostname for your server MUST NOT INCLUDE "https://" EG "www.example.com" (This code works better with nginx but you can use your own provider)
 
-proudctionPort: This should be your port number that is connected to your server (EG your nginx server port, example of nginx setup can be found in README.md)
+proudctionPort: This should be your port number that is connected to your server (EG your nginx server port)
 
 twitchUsername: Put Your Twitch Username here in full lowercase letters
 # If your hostname also has a path prefix you can go into main.ts and edit under "port" in "ReverseProxyAdapter":  "pathprefix" same case for the external port
@@ -88,12 +115,19 @@ Well I can't exactly help you setup your own domain and everything on cloudflare
 
 - Once this is done you can now go to the link:
 
-https://id.twitch.tv/oauth2/authorize?client_id=CLIENT_ID_GOES_HERE&redirect_uri=https://redirect.bucketbot.dev&response_type=token&scope=bits:read%20channel:read:subscriptions
+https://id.twitch.tv/oauth2/authorize?client_id=CLIENT_ID_GOES_HERE&redirect_uri=https://redirect.bucketbot.dev&response_type=token&scope=bits:read%20channel:read:subscriptions%20chat:read%20chat:edit
 
 - with replacing the `CLIENT_ID_GOES_HERE` with your client ID
   It's also worth noting that you can change the permission scopes by adding the scopes to the end of the link, in this link its:
+
   - `bits:read`
   - `channel:read:subscriptions`
+  - `chat:read`
+  - `chat:edit`
+
+  ##### REMEMBER
+
+  You must do this same proccess with getting your chatbot's access token (You can use the same Client ID but you need both access tokens, If the redirect auto logs you in try using incogneto mode or something.)
 
 You can split these up either with a space for with `&20`
 
@@ -101,7 +135,9 @@ You can find a list of scopes [here](https://dev.twitch.tv/docs/authentication/#
 
 After authorising you'll be redirected to https://redirect.bucketbot.dev
 With your access token being at the top of the page:
+
 ![](https://i.imgur.com/KwvtKvc.png)
 
 If you go to this website normally without authorising the website will look like this:
+
 ![](https://i.imgur.com/AKlFE55.png)
