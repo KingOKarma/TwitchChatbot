@@ -1,6 +1,6 @@
 # TwitchWebhook
 
-This is a test mainly for practicing how webhooks work and how twitch webhooks work/ Twitch-EventSub
+This is a twitchbot that can detect all kind of events and run custom commands, auto commands and send twitch chat to discord!
 
 ---
 
