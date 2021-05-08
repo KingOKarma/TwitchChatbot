@@ -228,7 +228,16 @@ export async function intiChatClient(): Promise<void> {
 
             if (message.startsWith(`${CONFIG.prefix}${last}`)) {
                 messages.pop();
-                return chatClient.say(channel, messages.join(" "));
+
+                let response = messages.join(" ");
+                const percentNum = Math.floor(Math.random() * 101);
+
+                if (response.includes("{%}")) {
+                    const replace = new RegExp("{%}", "g");
+                    response = response.replace(replace, `%${percentNum}`);
+                }
+
+                return chatClient.say(channel, response);
             }
 
         });
