@@ -181,8 +181,8 @@ export async function intiChatClient(): Promise<void> {
         Users.saveConfig();
     }
 
-    // Const ranNum = getRandomNumber(600000, 900000);
-    const ranNum = getRandomNumber(60000, 120000);
+    // 10 - 15 mins
+    const ranNum = getRandomNumber(600000, 900000);
 
     setInterval(() => {
         if (sentMessage) {
