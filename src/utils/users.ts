@@ -36,7 +36,7 @@ export default class Users {
     public static getConfig(): Users {
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (!fs.existsSync(Users._configLocation)) {
-            throw new Error("Please create a blockedUsers.yml");
+            throw new Error("Please create a users.yml");
         }
         const fileContents = fs.readFileSync(
             Users._configLocation,
