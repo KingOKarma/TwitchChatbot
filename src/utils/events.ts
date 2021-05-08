@@ -219,8 +219,19 @@ export async function intiChatClient(): Promise<void> {
 
         if (USERS.canSendMessage) {
             sentMessage = true;
-
         }
+
+        USERS.customCommands.forEach((ccContent) => {
+
+            const messages = ccContent.split(" ");
+            const last = messages[messages.length - 1];
+
+            if (message.startsWith(`${CONFIG.prefix}${last}`)) {
+                messages.pop();
+                return chatClient.say(channel, messages.join(" "));
+            }
+
+        });
 
 
         const args = message.slice(prefix.length).trim().split(/ +/g);
